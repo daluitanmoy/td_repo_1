@@ -1,3 +1,6 @@
+import { Octokit } from "https://cdn.skypack.dev/octokit";
+window.Octokit = new Octokit({ userAgent: 'agentName' });
+
 const octokit = new Octokit({ 
   auth: process.env.READ_VARIABLE_TOKEN,
 });
