@@ -1,5 +1,3 @@
-import { Octokit } from "octokit";
-
 const octokit = new Octokit({ 
   auth: process.env.READ_VARIABLE_TOKEN,
 });
