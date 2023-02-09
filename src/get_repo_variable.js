@@ -1,10 +1,8 @@
 import { Octokit } from "https://cdn.skypack.dev/octokit";
 window.Octokit = new Octokit({ userAgent: 'agentName' });
-const { MY_VAR } = 'undefined' !== typeof window ? window.env : process.env
-console.log("{MY_VAR}")
 
 const octokit = new Octokit({ 
-  auth: process.env.READ_VARIABLE_TOKEN,
+  auth: window.env.READ_VARIABLE_TOKEN,
 });
 
 function myfunction(){
