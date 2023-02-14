@@ -47,6 +47,7 @@ jobs:
           npm i
           npm run build
           npm run export
+          mv out read-settings
           ls -lrt
       
       - name: Setup Pages
