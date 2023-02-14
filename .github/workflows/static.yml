@@ -31,6 +31,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo READ_VARIABLE_TOKEN="${{ secrets.READ_VARIABLE_TOKEN }}" >> .env
+          echo TEST_VAR="${{ vars.TEST_VAR }}" >> .env
+          cat .env
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
