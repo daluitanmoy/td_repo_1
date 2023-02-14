@@ -53,7 +53,7 @@ jobs:
           mv out read-settings
           mkdir td_repo_1
           mv .next _next
-          cp -R _next td_repo_1
+          # cp -R _next td_repo_1
           ls -alrt
       
       - name: Setup Pages
