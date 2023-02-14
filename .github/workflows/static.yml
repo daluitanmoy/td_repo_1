@@ -40,11 +40,10 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
-          cache-dependency-path: next/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Build
         run: |
-          cd next
           npm i
           npm run build
           npm run export
@@ -57,7 +56,7 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './next'
+          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
