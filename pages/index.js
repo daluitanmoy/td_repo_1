@@ -1,8 +1,6 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 
-console.log(process.env.TEST_VAR)
-
 export default function Home() {
   console.log("TEST_VAR = " + process.env.TEST_VAR)
   return (
