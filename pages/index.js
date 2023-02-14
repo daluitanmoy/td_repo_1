@@ -57,7 +57,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
+          Powered by{process.env.READ_VARIABLE_TOKEN}
           <span className={styles.logo}>
             <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
