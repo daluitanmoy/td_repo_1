@@ -8,7 +8,7 @@ module.exports = {
    */
   // assetPrefix: isProd ? "/td_repo_1/" : "",
   // basePath: "",
-  assetPrefix: "/td_repo_1/",
+  assetPrefix: "//",
   /**
    * Disable server-based image optimization.
    *

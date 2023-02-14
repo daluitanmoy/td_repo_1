@@ -51,7 +51,7 @@ jobs:
           npm run build
           npm run export
           mv out read-settings
-          # mv .next _next
+          mv .next _next
           ls -alrt
       
       - name: Setup Pages
