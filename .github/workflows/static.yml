@@ -51,7 +51,8 @@ jobs:
           npm run build
           npm run export
           mv out read-settings
-          mv .next _next
+          mkdir td_repo_1
+          mv .next td_repo_1/_next
           ls -alrt
       
       - name: Setup Pages
