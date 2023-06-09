@@ -1,0 +1,10 @@
+{
+  "name": "Custom Action",
+  "description": "Custom Action Description",
+  "inputs": [
+    "name": "Inputs 1",
+    "type": "string",
+    "required": "true",
+    "default": "Test Data"
+  ]
+}
