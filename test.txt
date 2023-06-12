@@ -1,4 +1,17 @@
 import os
+import xml.etree.ElementTree as ET
+
+def get_unique_submodules():
+    unique_submodules = set()
+    for dir_name, subdir_list, file_list in os.walk('.'):
+        if 'pom.xml' in file_list:
+            pom_path = os.path.join(dir_name, 'pom.xml')
+            tree = ET.parse(pom_path)
+            root = tree.getroot()
+            artifact_id = root.find('.//{http://maven.apache.org/POM/4.0.0}artifactId')
+            if artifact_id is not None:
+                unique_submodules.add(artifact_id.text)
+    return list(unique_submodules)
 
 def generate_pom_file(modules):
     pom_template = """<?xml version="1.0" encoding="UTF-8"?>
@@ -36,11 +49,8 @@ def generate_pom_file(modules):
 if os.path.exists("pom.xml"):
     print("Root-level pom.xml file already exists.")
 else:
-    # Scan subdirectories for pom.xml files
-    modules = []
-    for dir_name, subdir_list, file_list in os.walk('.'):
-        if 'pom.xml' in file_list:
-            modules.append(subdir_list)
-
+    unique_submodules = get_unique_submodules()
+    modules = [unique_submodules]
+    
     generate_pom_file(modules)
     print("Root-level pom.xml file created successfully.")
