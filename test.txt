@@ -1,0 +1,31 @@
+def generate_pom_file(modules):
+    pom_template = """<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>root-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    
+    {module_references}
+</project>
+"""
+    module_reference_template = """    <modules>
+        <module>{module}</module>
+    </modules>
+"""
+
+    module_references = ""
+    for module in modules:
+        module_references += module_reference_template.format(module=module)
+
+    pom_content = pom_template.format(module_references=module_references)
+    with open("pom.xml", "w") as pom_file:
+        pom_file.write(pom_content)
+
+
+# Usage example
+modules = ["module1", "module2", "module3"]  # Replace with your actual module names
+generate_pom_file(modules)
