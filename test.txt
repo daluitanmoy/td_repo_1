@@ -15,24 +15,32 @@ def generate_pom_file(modules):
 </project>
 """
     module_reference_template = """    <modules>
-        <module>{module}</module>
+{module_elements}
     </modules>
 """
+    module_element_template = """        <module>{module}</module>"""
 
     module_references = ""
     for module in modules:
-        module_references += module_reference_template.format(module=module)
+        module_elements = ""
+        for sub_module in module:
+            module_elements += module_element_template.format(module=sub_module)
+        module_references += module_reference_template.format(module_elements=module_elements)
 
     pom_content = pom_template.format(module_references=module_references)
     with open("pom.xml", "w") as pom_file:
         pom_file.write(pom_content)
 
 
-# Get subdirectories with pom.xml files
-modules = [
-    subdir
-    for subdir, dirs, files in os.walk(".")
-    if "pom.xml" in files and subdir != "."
-]
+# Check if root-level pom.xml file already exists
+if os.path.exists("pom.xml"):
+    print("Root-level pom.xml file already exists.")
+else:
+    # Scan subdirectories for pom.xml files
+    modules = []
+    for dir_name, subdir_list, file_list in os.walk('.'):
+        if 'pom.xml' in file_list:
+            modules.append(subdir_list)
 
-generate_pom_file(modules)
+    generate_pom_file(modules)
+    print("Root-level pom.xml file created successfully.")
