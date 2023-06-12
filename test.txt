@@ -1,3 +1,5 @@
+import os
+
 def generate_pom_file(modules):
     pom_template = """<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -26,6 +28,11 @@ def generate_pom_file(modules):
         pom_file.write(pom_content)
 
 
-# Usage example
-modules = ["module1", "module2", "module3"]  # Replace with your actual module names
+# Get subdirectories with pom.xml files
+modules = [
+    subdir
+    for subdir, dirs, files in os.walk(".")
+    if "pom.xml" in files and subdir != "."
+]
+
 generate_pom_file(modules)
