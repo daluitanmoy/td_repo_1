@@ -1,7 +1,8 @@
 [
-  "Option 1",
-  "Option 2",
-  "Option 3",
-  "Option 4",
-  "Option 5"
+  { "name": "Option 1", "description": "Option 1 description"},
+  { "name": "Option 2", "description": "Option 2 description"},
+  { "name": "Option 3", "description": "Option 3 description"},
+  { "name": "Option 4", "description": "Option 4 description"},
+  { "name": "Option 5", "description": "Option 5 description"},
+  { "name": "Option 6", "description": "Option 6 description"}
 ]
