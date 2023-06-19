@@ -1,56 +1,68 @@
-import os
-import xml.etree.ElementTree as ET
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multi-Page Form</title>
+  <style>
+    .page {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <form id="multi-page-form">
+    <div class="page" id="page1">
+      <h2>Page 1</h2>
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+      <br>
+      <button type="button" onclick="nextPage()">Next</button>
+    </div>
 
-def get_unique_submodules():
-    unique_submodules = set()
-    for dir_name, subdir_list, file_list in os.walk('.'):
-        if 'pom.xml' in file_list:
-            pom_path = os.path.join(dir_name, 'pom.xml')
-            tree = ET.parse(pom_path)
-            root = tree.getroot()
-            artifact_id = root.find('.//{http://maven.apache.org/POM/4.0.0}artifactId')
-            if artifact_id is not None:
-                unique_submodules.add(artifact_id.text)
-    return list(unique_submodules)
+    <div class="page" id="page2">
+      <h2>Page 2</h2>
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
+      <br>
+      <button type="button" onclick="previousPage()">Previous</button>
+      <button type="button" onclick="nextPage()">Next</button>
+    </div>
 
-def generate_pom_file(modules):
-    pom_template = """<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.example</groupId>
-    <artifactId>root-project</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    
-    {module_references}
-</project>
-"""
-    module_reference_template = """    <modules>
-{module_elements}
-    </modules>
-"""
-    module_element_template = """        <module>{module}</module>"""
+    <div class="page" id="page3">
+      <h2>Page 3</h2>
+      <label for="message">Message:</label>
+      <textarea id="message" required></textarea>
+      <br>
+      <button type="button" onclick="previousPage()">Previous</button>
+      <button type="submit">Submit</button>
+    </div>
+  </form>
 
-    module_references = ""
-    for module in modules:
-        module_elements = ""
-        for sub_module in module:
-            module_elements += module_element_template.format(module=sub_module)
-        module_references += module_reference_template.format(module_elements=module_elements)
+  <script>
+    var currentPage = 0;
+    var pages = document.getElementsByClassName('page');
 
-    pom_content = pom_template.format(module_references=module_references)
-    with open("pom.xml", "w") as pom_file:
-        pom_file.write(pom_content)
+    function showPage(pageNumber) {
+      for (var i = 0; i < pages.length; i++) {
+        pages[i].style.display = 'none';
+      }
+      pages[pageNumber].style.display = 'block';
+    }
 
+    function nextPage() {
+      if (currentPage < pages.length - 1) {
+        currentPage++;
+        showPage(currentPage);
+      }
+    }
 
-# Check if root-level pom.xml file already exists
-if os.path.exists("pom.xml"):
-    print("Root-level pom.xml file already exists.")
-else:
-    unique_submodules = get_unique_submodules()
-    modules = [unique_submodules]
-    
-    generate_pom_file(modules)
-    print("Root-level pom.xml file created successfully.")
+    function previousPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        showPage(currentPage);
+      }
+    }
+
+    showPage(currentPage);
+  </script>
+</body>
+</html>
