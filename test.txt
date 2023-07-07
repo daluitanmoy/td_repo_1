@@ -1,68 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Multi-Page Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-yaml.min.js"></script>
   <style>
-    .page {
-      display: none;
+    .container {
+      width: 600px;
+      margin: 0 auto;
+    }
+    textarea {
+      width: 100%;
+      height: 400px;
     }
   </style>
 </head>
 <body>
-  <form id="multi-page-form">
-    <div class="page" id="page1">
-      <h2>Page 1</h2>
-      <label for="name">Name:</label>
-      <input type="text" id="name" required>
-      <br>
-      <button type="button" onclick="nextPage()">Next</button>
-    </div>
-
-    <div class="page" id="page2">
-      <h2>Page 2</h2>
-      <label for="email">Email:</label>
-      <input type="email" id="email" required>
-      <br>
-      <button type="button" onclick="previousPage()">Previous</button>
-      <button type="button" onclick="nextPage()">Next</button>
-    </div>
-
-    <div class="page" id="page3">
-      <h2>Page 3</h2>
-      <label for="message">Message:</label>
-      <textarea id="message" required></textarea>
-      <br>
-      <button type="button" onclick="previousPage()">Previous</button>
-      <button type="submit">Submit</button>
-    </div>
-  </form>
-
+  <div class="container">
+	<textarea id="plainTextarea"></textarea>
+    <pre><code id="yamlTextarea" class="language-yaml"></code></pre>
+  </div>
+  
   <script>
-    var currentPage = 0;
-    var pages = document.getElementsByClassName('page');
-
-    function showPage(pageNumber) {
-      for (var i = 0; i < pages.length; i++) {
-        pages[i].style.display = 'none';
-      }
-      pages[pageNumber].style.display = 'block';
-    }
-
-    function nextPage() {
-      if (currentPage < pages.length - 1) {
-        currentPage++;
-        showPage(currentPage);
-      }
-    }
-
-    function previousPage() {
-      if (currentPage > 0) {
-        currentPage--;
-        showPage(currentPage);
-      }
-    }
-
-    showPage(currentPage);
+    document.addEventListener("DOMContentLoaded", function() {
+      var plainTextarea = document.getElementById("plainTextarea");
+      plainTextarea.addEventListener("input", function() {
+		var yamlTextarea = document.getElementById("yamlTextarea");
+        var code = this.value;
+        var highlightedCode = Prism.highlight(code, Prism.languages.yaml, "yaml");
+        yamlTextarea.innerHTML = highlightedCode;
+      });
+    });
   </script>
 </body>
 </html>
