@@ -115,6 +115,41 @@
       inputField.setSelectionRange(beforeText.length + option.length + 3, beforeText.length + option.length + 3);
       popupSelect.style.display = 'none';
     }
+
+    inputField.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        const currentIndex = Array.from(popupSelect.options).findIndex(option => option.selected);
+
+        if (event.key === 'ArrowUp') {
+          const previousIndex = currentIndex > 0 ? currentIndex - 1 : popupSelect.options.length - 1;
+          popupSelect.options[previousIndex].selected = true;
+        } else if (event.key === 'ArrowDown') {
+          const nextIndex = currentIndex < popupSelect.options.length - 1 ? currentIndex + 1 : 0;
+          popupSelect.options[nextIndex].selected = true;
+        }
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const selectedValue = popupSelect.value;
+        if (selectedValue) {
+          const inputText = inputField.value;
+          const beforeText = inputText.substring(0, inputText.lastIndexOf('${{'));
+          const afterText = inputText.substring(inputText.lastIndexOf('}}') + 2, inputText.length);
+          inputField.value = beforeText + selectedValue + afterText;
+          popupSelect.style.display = 'none';
+          cursorPosition = beforeText.length + selectedValue.length;
+          inputField.setSelectionRange(cursorPosition, cursorPosition);
+        }
+      }
+    });
+
+    inputField.addEventListener('keyup', () => {
+      cursorPosition = inputField.selectionStart;
+    });
+
+    inputField.addEventListener('blur', () => {
+      popupSelect.style.display = 'none';
+    });
   </script>
 </body>
 </html>
