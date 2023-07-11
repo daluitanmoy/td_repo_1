@@ -1,36 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-yaml.min.js"></script>
+  <title>Select Option Popup</title>
   <style>
-    .container {
-      width: 600px;
-      margin: 0 auto;
+    #inputField {
+      display: block;
+      margin-bottom: 10px;
     }
-    textarea {
-      width: 100%;
-      height: 400px;
+
+    #popupSelect {
+      position: absolute;
+      display: none;
+      font-size: 14px; /* Set your desired font size here */
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #popupSelect li {
+      padding: 5px;
+    }
+
+    #popupSelect li:hover {
+      background-color: #e8e8e8;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-	<textarea id="plainTextarea"></textarea>
-    <pre><code id="yamlTextarea" class="language-yaml"></code></pre>
-  </div>
-  
+  <label for="inputField">Type ${{:</label>
+  <input type="text" id="inputField">
+
+  <ul id="popupSelect"></ul>
+
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      var plainTextarea = document.getElementById("plainTextarea");
-      plainTextarea.addEventListener("input", function() {
-		var yamlTextarea = document.getElementById("yamlTextarea");
-        var code = this.value;
-        var highlightedCode = Prism.highlight(code, Prism.languages.yaml, "yaml");
-        yamlTextarea.innerHTML = highlightedCode;
-      });
+    const listOptions = [' Option 1', 'Option 2', 'Option 3', 'Option 4'];
+    const inputField = document.getElementById('inputField');
+    const popupSelect = document.getElementById('popupSelect');
+
+    function calculateFontWidth() {
+      const span = document.createElement('span');
+      span.textContent = 'a';
+      span.style.fontSize = window.getComputedStyle(popupSelect).fontSize;
+      document.body.appendChild(span);
+      const fontWidth = span.offsetWidth;
+      document.body.removeChild(span);
+      return fontWidth;
+    }
+
+    inputField.addEventListener('input', () => {
+      const inputText = inputField.value;
+      const cursorPosition = inputField.selectionStart;
+	  var lastTypedLetter = inputText.substring(cursorPosition -1, cursorPosition);
+	  
+      if(lastTypedLetter === '{') {
+		  var searchText = inputText.substring(inputText.substring(0, cursorPosition).lastIndexOf('${{') + 3, cursorPosition);
+		  if (inputText.substring(cursorPosition - 3, cursorPosition).endsWith('${{') || searchText.length > 0) {
+			const filteredOptions = listOptions.filter(option =>
+			  option.toLowerCase().includes(searchText.toLowerCase())
+			);
+
+			if (filteredOptions.length > 0) {
+			  popupSelect.innerHTML = '';
+			  filteredOptions.forEach(option => {
+				const newLi = document.createElement('li');
+				newLi.textContent = option;
+				newLi.addEventListener('click', () => {
+				  insertOption(option);
+				});
+				popupSelect.appendChild(newLi);
+			  });
+
+			  popupSelect.style.display = 'block';
+			  const inputRect = inputField.getBoundingClientRect();
+			  const popupSelectRect = popupSelect.getBoundingClientRect();
+			  const fontWidth = calculateFontWidth();
+			  const popupLeftPos = (inputRect.left + cursorPosition * fontWidth) <= (inputRect.right - popupSelectRect.width) ? (inputRect.left + cursorPosition * fontWidth) : (inputRect.right - popupSelectRect.width);
+			  popupSelect.style.left = `${popupLeftPos}px`;
+			  popupSelect.style.top = `${inputRect.top + inputField.offsetHeight}px`;
+			} else {
+			  popupSelect.style.display = 'none';
+			}
+		  } else {
+			popupSelect.style.display = 'none';
+		  }
+		  
+	  } else if(lastTypedLetter === '.'){
+			var dotIndex = cursorPosition - 1;
+			// Check if a dot is found and it's not the first character
+			if (dotIndex !== -1 && dotIndex !== 0) {
+				// Find the index of the last space or dot before the dotIndex
+				var spaceIndex = inputText.substring(0, cursorPosition).lastIndexOf(' ', dotIndex);
+				var braceIndex = inputText.substring(0, cursorPosition).lastIndexOf('{', dotIndex);
+				var dotBeforeIndex = inputText.substring(0, cursorPosition).lastIndexOf('.', dotIndex - 1);
+
+				// Choose the index of the preceding space or dot that occurs later
+				var precedingIndex = Math.max(spaceIndex, braceIndex);
+				precedingIndex = Math.max(precedingIndex, dotBeforeIndex);
+
+				// Extract the word before the dot
+				var wordBeforeDot = inputText.substring(precedingIndex + 1, dotIndex);
+
+				console.log(wordBeforeDot);
+		  }
+	  }
     });
+
+    function insertOption(option) {
+      const inputText = inputField.value;
+      const cursorPosition = inputField.selectionStart;
+      const beforeText = inputText.substring(0, inputText.substring(0, cursorPosition).lastIndexOf('${{'));
+      const afterText = inputText.substring(cursorPosition);
+      inputField.value = beforeText + '${{' + option + afterText;
+      inputField.focus();
+      inputField.setSelectionRange(beforeText.length + option.length + 3, beforeText.length + option.length + 3);
+      popupSelect.style.display = 'none';
+    }
   </script>
 </body>
 </html>
