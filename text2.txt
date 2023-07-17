@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Input Field Validation</title>
+  <style>
+    .error {
+      border: 2px solid red;
+    }
+
+    .error-message {
+      background-color: #ffcccc;
+      color: red;
+      border: 1px solid red;
+      padding: 4px 8px;
+      position: absolute;
+      z-index: 1;
+      width: fit-content;
+    }
+  </style>
+  <script>
+    // Regular expression for validation
+    var regex = /^[a-zA-Z]+$/;
+
+    // Function to handle input validation
+    function validateInput(input) {
+      var value = input.value.trim();
+      var isValid = regex.test(value);
+
+      if (!isValid) {
+        var errorContainer = input.nextElementSibling;
+        if (!errorContainer || !errorContainer.classList.contains('error-message')) {
+          errorContainer = document.createElement('div');
+          errorContainer.classList.add('error-message');
+          input.parentNode.insertBefore(errorContainer, input.nextSibling);
+        }
+        errorContainer.textContent = 'Invalid input! Only letters are allowed.';
+        input.classList.add('error');
+
+        
+      } else {
+		var errorContainer = input.nextElementSibling;
+		if (errorContainer && errorContainer.classList.contains('error-message')) {
+			input.classList.remove('error');
+			errorContainer.remove();
+		}
+	  }
+    }
+  </script>
+</head>
+<body>
+  <div style="display: flex">
+  <input type="text" oninput="validateInput(this)" placeholder="Enter letters only" />
+  <input/>
+  <input/>
+  </div>
+</body>
+</html>
