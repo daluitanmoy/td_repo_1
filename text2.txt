@@ -8,7 +8,7 @@ param (
     [string]$PAT
 )
 
-function Get-AzurePipelines {
+function Get-AzureDevOpsReleases {
     param (
         [string]$OrganizationName,
         [string]$ProjectName,
@@ -18,33 +18,36 @@ function Get-AzurePipelines {
     # Convert the Personal Access Token (PAT) to a Base64 encoded string
     $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$PAT"))
 
-    # Define the Azure DevOps REST API endpoint to get the pipelines
-    $url = "https://dev.azure.com/$OrganizationName/$ProjectName/_apis/pipelines?api-version=6.0-preview.1"
+    # Define the Azure DevOps REST API endpoint to get the releases
+    $url = "https://vsrm.dev.azure.com/$OrganizationName/$ProjectName/_apis/release/releases?api-version=6.0"
 
-    # Invoke the REST API to get pipeline data
-    $pipelines = Invoke-RestMethod -Uri $url -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -Method Get
+    # Invoke the REST API to get release data
+    $releases = Invoke-RestMethod -Uri $url -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -Method Get
 
-    return $pipelines.value
+    return $releases.value
 }
 
-# Get the pipelines using the provided parameters
-$pipelines = Get-AzurePipelines -OrganizationName $OrganizationName -ProjectName $ProjectName -PAT $PAT
+# Get the releases using the provided parameters
+$releases = Get-AzureDevOpsReleases -OrganizationName $OrganizationName -ProjectName $ProjectName -PAT $PAT
 
-# Create an array to store pipeline information
-$pipelineInfo = @()
+# Create an array to store release information
+$releaseInfo = @()
 
-# Loop through the pipelines and extract the name and path for those containing "IAM" in their name
-foreach ($pipeline in $pipelines) {
-    if ($pipeline.name -like "*IAM*") {
-        $pipelineData = [PSCustomObject]@{
-            Name = $pipeline.name
-            Path = $pipeline.path
+# Loop through the releases and extract the name and folder path for those containing "PAT" in their name
+foreach ($release in $releases) {
+    if ($release.name -like "*PAT*") {
+        # Extract the release folder path
+        $releaseFolderPath = ($release.releaseDefinition.path -split '\\') -join '/'
+
+        $releaseData = [PSCustomObject]@{
+            Name = $release.name
+            FolderPath = $releaseFolderPath
         }
-        $pipelineInfo += $pipelineData
+        $releaseInfo += $releaseData
     }
 }
 
-# Export the filtered pipeline information to a CSV file
-$pipelineInfo | Export-Csv -Path "AzurePipelinesInfo_Filtered.csv" -NoTypeInformation
+# Export the filtered release information to a CSV file
+$releaseInfo | Export-Csv -Path "AzureDevOpsReleasesInfo_Filtered.csv" -NoTypeInformation
 
-Write-Host "Filtered pipeline information exported to 'AzurePipelinesInfo_Filtered.csv' successfully."
+Write-Host "Filtered release information exported to 'AzureDevOpsReleasesInfo_Filtered.csv' successfully."
