@@ -1,57 +1,50 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Input Field Validation</title>
-  <style>
-    .error {
-      border: 2px solid red;
-    }
+Install-Module -Name Az -Force
 
-    .error-message {
-      background-color: #ffcccc;
-      color: red;
-      border: 1px solid red;
-      padding: 4px 8px;
-      position: absolute;
-      z-index: 1;
-      width: fit-content;
-    }
-  </style>
-  <script>
-    // Regular expression for validation
-    var regex = /^[a-zA-Z]+$/;
+.\Get-AzurePipelines.ps1 -OrganizationName "your_org_name" -ProjectName "your_project_name" -PAT "your_pat"
 
-    // Function to handle input validation
-    function validateInput(input) {
-      var value = input.value.trim();
-      var isValid = regex.test(value);
+param (
+    [string]$OrganizationName,
+    [string]$ProjectName,
+    [string]$PAT
+)
 
-      if (!isValid) {
-        var errorContainer = input.nextElementSibling;
-        if (!errorContainer || !errorContainer.classList.contains('error-message')) {
-          errorContainer = document.createElement('div');
-          errorContainer.classList.add('error-message');
-          input.parentNode.insertBefore(errorContainer, input.nextSibling);
+function Get-AzurePipelines {
+    param (
+        [string]$OrganizationName,
+        [string]$ProjectName,
+        [string]$PAT
+    )
+
+    # Convert the Personal Access Token (PAT) to a Base64 encoded string
+    $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$PAT"))
+
+    # Define the Azure DevOps REST API endpoint to get the pipelines
+    $url = "https://dev.azure.com/$OrganizationName/$ProjectName/_apis/pipelines?api-version=6.0-preview.1"
+
+    # Invoke the REST API to get pipeline data
+    $pipelines = Invoke-RestMethod -Uri $url -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -Method Get
+
+    return $pipelines.value
+}
+
+# Get the pipelines using the provided parameters
+$pipelines = Get-AzurePipelines -OrganizationName $OrganizationName -ProjectName $ProjectName -PAT $PAT
+
+# Create an array to store pipeline information
+$pipelineInfo = @()
+
+# Loop through the pipelines and extract the name and path for those containing "IAM" in their name
+foreach ($pipeline in $pipelines) {
+    if ($pipeline.name -like "*IAM*") {
+        $pipelineData = [PSCustomObject]@{
+            Name = $pipeline.name
+            Path = $pipeline.path
         }
-        errorContainer.textContent = 'Invalid input! Only letters are allowed.';
-        input.classList.add('error');
-
-        
-      } else {
-		var errorContainer = input.nextElementSibling;
-		if (errorContainer && errorContainer.classList.contains('error-message')) {
-			input.classList.remove('error');
-			errorContainer.remove();
-		}
-	  }
+        $pipelineInfo += $pipelineData
     }
-  </script>
-</head>
-<body>
-  <div style="display: flex">
-  <input type="text" oninput="validateInput(this)" placeholder="Enter letters only" />
-  <input/>
-  <input/>
-  </div>
-</body>
-</html>
+}
+
+# Export the filtered pipeline information to a CSV file
+$pipelineInfo | Export-Csv -Path "AzurePipelinesInfo_Filtered.csv" -NoTypeInformation
+
+Write-Host "Filtered pipeline information exported to 'AzurePipelinesInfo_Filtered.csv' successfully."
